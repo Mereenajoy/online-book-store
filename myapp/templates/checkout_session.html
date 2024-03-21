@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <!-- Include Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <h1>Checkout</h1>
+    <button id="checkout-button">Checkout</button>
+
+    <script>
+        var stripe = Stripe('YOUR_PUBLISHABLE_KEY');  // Replace with your Stripe publishable key
+        
+        document.getElementById('checkout-button').addEventListener('click', function() {
+            fetch('/create_checkout_session', {  // Replace with the URL of your Django view
+                method: 'POST',
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(session) {
+                return stripe.redirectToCheckout({ sessionId: session.sessionId });
+            })
+            .then(function(result) {
+                // If `redirectToCheckout` fails, display an error to the customer.
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

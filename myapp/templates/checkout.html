@@ -1,0 +1,271 @@
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .box-element {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        #form-wrapper {
+            border: 1px solid #dee2e6;
+        }
+
+        #user-info,
+        #shipping-info {
+            margin-bottom: 20px;
+        }
+
+        #form-button {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+
+        #payment-info {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .cart-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .row-image {
+            max-width: 50px;
+            max-height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        hr {
+            border-color: #dee2e6;
+        }
+
+        .cart-info {
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .cart-table {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cart-header,
+        .cart-row {
+            display: table-row;
+        }
+
+        .cart-cell {
+            display: table-cell;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .cart-info {
+            font-weight: bold;
+        }
+
+        .cart-row {
+            padding: 10px 0;
+            /* Add padding between each row */
+        }
+    </style>
+</head>
+
+<body>
+    <br><br>
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="box-element" id="form-wrapper">
+                    <form id="form" method="POST" action='checkout'>
+                        {% csrf_token %}
+                        <div id="user-info">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input required class="form-control" type="text" name="name" value="{{user.name}}"
+                                    placeholder="Name.." pattern="[A-Za-z]{}" maxlength="20" required onkeypress="return allowOnlyLetters(event,this);" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input required class="form-control" type="email" name="email" value="{{user.email}}"
+                                    placeholder="Email..">
+                            </div>
+                        </div>
+
+                        <div id="shipping-info">
+                            <hr>
+                            <p>Shipping Information:</p>
+                            <hr>
+                            <div class="form-group">
+                                <label for="address">Addressline 1</label>
+                                <input class="form-control" type="text" name="address" value="{{user.address}}"
+                                    placeholder="Address.." pattern="[A-Za-z]{}" maxlength="20" required onkeypress="return allowOnlyLetters(event,this);" autocomplete="off">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contact">Contact</label>
+                                <input class="form-control" type="text" name="contact" value="{{user.contact}}"
+                                    placeholder="Contact.." pattern="[0-9]{}" minlength="10" maxlength="10" id="numberInput" onblur="validateNumber()" onkeypress="return isNumberKey(event,this)"  required="required">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="pincode">Pin code</label>
+                                <input class="form-control" type="text" name="pincode" value="{{user.pin}}"
+                                    placeholder="Pin code.."pattern="[0-9]{6}" minlength="6" maxlength="6" id="numberInput" onblur="validateNumber()" onkeypress="return isNumberKey(event,this)"  required="required">
+                            </div>
+                            <input type="hidden" name="total" value="{{cart.total}}">
+                        </div>
+
+                        <hr>
+                        <input id="form-button" class="btn btn-success btn-block" type="submit" value="Place Order">
+                    </form>
+                </div>
+
+
+            </div>
+
+            <div class="col-lg-6">
+                <div class="box-element">
+                    <a class="btn btn-outline-dark" href="{% url 'my-cart' %}">&#x2190; Back to Cart</a>
+                    <hr>
+                    <h3>Order Summary</h3>
+                    <hr>
+
+                    <!-- {% for cp in cart.cartproduct_set.all %}
+                <div class="cart-row">
+                    <div style="flex:2"><img class="row-image" src="{{cp.product.p_image.url}}" alt="{{cp.product.p_name}}"></div>
+                    <div style="flex:2"><p>{{cp.product.p_name}}</p></div>
+                    <div style="flex:1"><p>{{cp.product.p_price|floatformat:2}}</p></div>
+                    <div style="flex:1"><p>Quantity : {{cp.quantity}}</p></div>
+                </div>
+                {% endfor %} -->
+                    <div class="cart-table">
+                        <div class="cart-header">
+                            <div class="cart-cell">Image</div>
+                            <div class="cart-cell">Product</div>
+                            <div class="cart-cell">Price</div>
+                            <div class="cart-cell">Quantity</div>
+                        </div>
+                        {% for cp in cart.cartproduct_set.all %}
+                        <div class="cart-row">
+                            <div class="cart-cell cart-info"><img class="row-image" src="{{cp.product.image.url}}"
+                                    alt="{{cp.product.title}}"></div>
+                            <div class="cart-cell cart-info">{{cp.product.title}}</div>
+                            <div class="cart-cell cart-info">{{cp.product.price|floatformat:2}}</div>
+                            <div class="cart-cell cart-info">{{cp.quantity}}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <h5>Total: &#8377;&nbsp;{{cart.total}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Razorpay script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var totalAmountInPaise = {{ cart.total }} * 100;
+        var options = {
+            "key": "rzp_test_2zoDLngFFBYiGi",
+            "amount": totalAmountInPaise,
+            "currency": "INR",
+            "name": "Book Haven",
+            "description": "Booking Transaction",
+            "image": "imageUrl",
+            "order_id": "",
+            "handler": function (response) {
+                // This function will be triggered after successful payment
+                // You can submit the form here
+                document.getElementById('form').submit();
+            },
+            "theme": {
+                "color": "#791c46"
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Open Razorpay checkout when the form is submitted
+            document.getElementById('form').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent default form submission
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            });
+        });
+    </script>
+
+<script language="Javascript" type="text/javascript">
+
+    function allowOnlyLetters(e, t)
+    {
+       if (window.event)
+       {
+          var charCode = window.event.keyCode;
+       }
+       else if (e)
+       {
+          var charCode = e.which;
+       }
+       else { return true; }
+       if ((charCode > 64 && charCode < 91) || (charCode > 96 && charCode < 123))
+           return true;
+       else
+       {
+          alert("Please enter only alphabets");
+          return false;
+       }
+    }
+    </script>
+    <script language="Javascript" type="text/javascript">
+    
+            function isNumberKey(evt, obj) {
+    
+                var charCode = (evt.which) ? evt.which : event.keyCode
+                var value = obj.value;
+                var dotcontains = value.indexOf(".") != -1;
+                if (dotcontains)
+                    if (charCode == 46) return false;
+                if (charCode == 46) return true;
+                if (charCode > 31 && (charCode < 48 || charCode > 57))
+                    return false;
+    
+                return true;
+            }
+    
+    </script>
+<script>
+    function validateNumber() {
+      var numberInput = document.getElementById("numberInput");
+      var value = numberInput.value;
+
+      if (value === "0000000000" || value === "1111111111" || value === "2222222222" || value === "3333333333" || value === "4444444444" || value === "5555555555" || value === "6666666666" || value === "7777777777" || value ==="8888888888" || value ==="9999999999")
+      {
+        alert("Please enter a valid phone number");
+        numberInput.value = "";
+        return false;
+      }
+    }
+  </script>
+
+
+
+</body>

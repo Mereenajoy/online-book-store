@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="../static/css/sign.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+
+<body>
+    <div class="bg-img">
+        <div class="content">
+            <header>Sign in Form</header>
+            {% if msg %}
+            <p style="color: red;">{{ msg }}</p>
+           
+          {% endif %}
+            <form name="signup" action="signup" method="post" onsubmit="return signupValidation()">
+                {% csrf_token %}
+
+                <div class="field">
+                    <span class="fa fa-user"></span>
+                    <input type="text" name="fname"  placeholder="First Name" pattern="[A-Za-z]{}" maxlength="20" required onkeypress="return allowOnlyLetters(event,this);" autocomplete="off">
+                </div>
+                <div class="field spa">
+                    <span class="fa fa-envelope"></span>
+                    <input type="email" name="email"  placeholder="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
+                </div>
+                <div class="field space">
+                    <span class="fa fa-lock"></span>
+                    <input type="password" name="password" class="pass-key"  placeholder="Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 6 or more characters" required>
+                    <span class="show">SHOW</span>
+                </div>
+                <div class="pass">
+                    <!-- <a href="#">Forgot Password?</a> -->
+                </div>
+                <div class="field">
+                    <input type="submit" value="Sign Up">
+                </div>
+            </form>
+            <!-- <div class="login">
+                Or sign with
+            </div>
+            <div class="links">
+                <div class="facebook">
+                    <i class="fab fa-google"><span>Google</span></i>
+                </div> -->
+                <!-- <div class="instagram">
+                  <i class="fab fa-instagram"><span>Instagram</span></i>
+               </div> -->
+            <!-- </div> -->
+            <div class="signup">
+                Already have an account <a href="/login">Login Now</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        const pass_field = document.querySelector('.pass-key');
+        const showBtn = document.querySelector('.show');
+        showBtn.addEventListener('click', function () {
+            if (pass_field.type === "password") {
+                pass_field.type = "text";
+                showBtn.textContent = "HIDE";
+                showBtn.style.color = "#3498db";
+            } else {
+                pass_field.type = "password";
+                showBtn.textContent = "SHOW";
+                showBtn.style.color = "#222";
+            }
+        });
+    </script>
+    <script>
+        function signupValidation() {
+            var firstName = document.forms["signup"]["fname"].value;
+            var email = document.forms["signup"]["email"].value;
+            var password = document.forms["signup"]["password"].value;
+    
+            if (firstName == "" || email == "" || password == "") {
+                alert("All fields must be filled out");
+                return false;
+            }
+    
+            // You can add additional validation rules here for each field if needed
+    
+            return true;
+        }
+    </script>
+
+<script language="Javascript" type="text/javascript">
+    function allowOnlyLetters(e) {
+        var charCode = (e.which) ? e.which : e.keyCode;
+        if ((charCode < 65 || charCode > 90) && (charCode < 97 || charCode > 122) && charCode !== 32) {
+            alert("Please enter only letters and spaces.");
+            return false;
+        }
+        return true;
+    }
+</script>
+    
+</body>
+
+</html>
